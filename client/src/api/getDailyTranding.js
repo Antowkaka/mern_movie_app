@@ -1,8 +1,8 @@
 import Axios from "axios";
-import config from "../../../config/default.json"
+require('dotenv').config()
 
 export function getDailyTranding ()  {
-    Axios.get(`https://api.themoviedb.org/3/trending/movie/day?api_key=${config.apiKey}`)
+    Axios.get(`https://api.themoviedb.org/3/trending/movie/day?api_key=${process.env.API_KEY}`)
         .then(res => {
             return res
         })

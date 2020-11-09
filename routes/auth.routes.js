@@ -1,5 +1,5 @@
 const {Router} = require('express')
-const config = require('config')
+require('dotenv').config()
 const bcrypt = require('bcryptjs')
 const {check, validationResult} = require('express-validator')
 const User = require('../models/User')
@@ -27,17 +27,24 @@ router.post(
                     message: 'Incorrect registration data'
                 })
             }
-            const {email, password} = req.body
+            const {userEmail, userPass} = req.body
 
-            const guest = await User.findOne({email})
+            console.log('User mail: ', userEmail)
+            console.log('User pass: ', userPass)
+
+
+            const guest = await User.findOne({userEmail})
 
             guest && res.status(400).json({message: 'User is exist'})
 
-            const passHash = await bcrypt.hash(password, 12)
-            const user = new User({email, password: passHash})
+            const passHash = await bcrypt.hash(userPass, 12)
+            const user = new User({userEmail, userPass: passHash})
 
             await user.save()
+
+            res.status(201).json({message: 'User created'})
         } catch (e) {
+            console.log(e)
             res.status(500).json({message: 'Something went wrong'})
         }
     })
@@ -46,8 +53,8 @@ router.post(
 router.post(
     '/login',
     [
-        check('email', 'Enter correct email').normalizeEmail().isEmail(),
-        check('password', 'Enter password').exists()
+        check('userEmail', 'Enter correct email').normalizeEmail().isEmail(),
+        check('userPass', 'Enter password').exists()
     ],
     async (req, res) => {
         try {
@@ -60,15 +67,15 @@ router.post(
                 })
             }
 
-            const {email, password} = req.body
+            const {userEmail, userPass} = req.body
 
-            const user = await USer.findOne({ email })
+            const user = await User.findOne({ userEmail })
 
             if (!user) {
                 return res.status(400).json({message: 'User not found'})
             }
 
-            const isMatch = await bcrypt.compare(password, user.password)
+            const isMatch = await bcrypt.compare(userPass, user.userPass)
 
             if (!isMatch) {
                 return res.status(400).json({message: 'Incorrect password, try again'})
@@ -76,12 +83,13 @@ router.post(
 
             const token = jwt.sign(
                 { userId: user.id },
-                config.get('jwtSalt'),
+                process.env.JWT_SALT,
                 {expiresIn: '1h'}
             )
 
             res.json({ token, userId: user.id })
         } catch (e) {
+            console.log(e)
             res.status(500).json({message: 'Something went wrong'})
         }
     })

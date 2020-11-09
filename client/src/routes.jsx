@@ -27,6 +27,9 @@ export const useRoutes = isAuth => {
             <Route path="/registration">
                 <Registration/>
             </Route>
+            <Route path="/login">
+                <Login/>
+            </Route>
             <Redirect to="/registration"/>
         </Switch>
     )

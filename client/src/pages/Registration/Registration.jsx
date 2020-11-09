@@ -28,7 +28,7 @@ const StyledRegForm = styled.form`
     margin: 10px 0;
     height: 30px;
     
-    &:last-child {
+    &[type="submit"] {
       text-transform:uppercase;
       color: antiquewhite;
       background-color: #9f4456;
@@ -47,21 +47,21 @@ const StyledRegForm = styled.form`
 
 export const Registration = () => {
     const { register, handleSubmit, watch, errors } = useForm()
-    const {loading, error, request, clearError} = useHttp()
+    const {loading, request, error, clearError} = useHttp()
     const [reqError, setReqError] = useState('')
 
-    const onSubmit = async (body) => {
+    const registerOnSubmit = async (body) => {
         try {
             const data = await request('/api/auth/registration', 'POST', body)
-            console.log(data)
+            console.log('Response: ', data)
         } catch (e) {
-            console.log('Error submit', e)
+            console.log('Error submit', e.response)
         }
     }
 
     return (
         <BodySkeleton>
-            <StyledRegForm onSubmit={handleSubmit(onSubmit)}>
+            <StyledRegForm onSubmit={handleSubmit(registerOnSubmit)}>
                 <h2>Sign in</h2>
                 <input type="text" placeholder="Email" name="userEmail" ref={register({required: true})}/>
                 {errors.userEmail && <span>This is required</span>}

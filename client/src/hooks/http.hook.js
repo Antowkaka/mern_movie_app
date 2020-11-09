@@ -1,7 +1,7 @@
 import {useCallback, useState} from 'react'
 import axios from 'axios'
 
-export const useHttp = (callback, deps) => {
+export const useHttp = (callback) => {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState(null)
 
@@ -13,23 +13,40 @@ export const useHttp = (callback, deps) => {
                 method,
                 data: body,
                 headers
-            })
+            }
+            )
 
             const data = await response.json()
-
-            if (response.statusText !== 'OK') {
-                throw new Error(data.message || 'Something went wrong')
+            if (response.status !== 201) {
+                throw new Error(response.data.message || 'Something went wrong')
             }
 
             setLoading(false)
             return data
         } catch (e) {
             setLoading(false)
-            console.log('Catch: ', e.response.data);
-            setError(e.message)
+            console.log('Catch: ', e.response)
+            setError(e.response.data.message)
+            console.log('Err 1 : ', error)
             throw e
         }
-    }, deps)
+
+        // await axios({url, method, data: body, headers})
+        //     .then(res => {
+        //         setLoading(false)
+        //     })
+        //     .catch(err => {
+        //         const errMsg = err.response.data.message
+        //         console.log(errMsg)
+        //         setLoading(false)
+        //         setStateError(errMsg)
+        //         setStateError(state => {
+        //             console.log('State in ErrorState: ', state)
+        //             return state
+        //         })
+        //         console.log('Updated state: ', stateError)
+        //     })
+    }, [])
 
     const clearError = useCallback(() => setError(null), [])
 

@@ -10,7 +10,7 @@ import {
 import {useRoutes} from "./routes";
 
 function App() {
-  const routes = useRoutes(false)
+  const routes = useRoutes(true)
 
   return (
     <Router className="App">
